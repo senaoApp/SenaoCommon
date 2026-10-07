@@ -12,8 +12,9 @@ public class HttpRequest: NSObject {
     }()
 
     public func post<Parameters: Encodable & Sendable>(url: String, parameter: Parameters, headers: [String: String]? = nil) -> Single<HttpStatus<Data>> {
-        Single<HttpStatus<Data>>.create { closure in
-            let request = AF.request(url, method: .post, parameters: parameter, headers: headers).response(queue:.global()) {
+        Single<HttpStatus<Data>>.create { [manager] closure in
+            let httpHeaders = headers.map(HTTPHeaders.init)
+            let request = manager.request(url, method: .post, parameters: parameter, headers: httpHeaders).response(queue:.global()) {
                 response in
                 switch response.result {
                 case .success(let data):
